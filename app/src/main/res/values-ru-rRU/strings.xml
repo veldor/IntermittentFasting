@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Интервальное голодание</string>
+    <string name="timer_fragment_title">Таймер</string>
+    <string name="title_dashboard">Графики</string>
+    <string name="title_notifications">Настройки</string>
+    <string name="start_fasting_timer">Начать время голода</string>
+    <string name="start_eating_timer">Начать пищевое окно</string>
+    <string name="fasting_time_message">Время поголодать</string>
+    <string name="eating_time_message">Всё, можно есть</string>
+    <string name="congratulations_1_message">Поздравляем, вы продержались больше 16 часов!</string>
+    <string name="congratulations_2_message">Поздравляем, вы продержались больше 14 часов!</string>
+    <string name="congratulations_3_message">Поздравляем, вы продержались больше 12 часов!</string>
+    <string name="notification_channel_id">Уведомления таймера</string>
+    <string name="its_fasting_time_message">Время голода</string>
+    <string name="its_eating_time_message">Пищевое окно</string>
+    <string name="still_fasting_message">Вы только что начали голодать</string>
+    <string name="still_eating_message">Только что началось пищевое окно</string>
+    <string name="you_fasting_message">"\"Вы голодаете "</string>
+    <string name="you_eating_message">"\"Пищевое окно длится  "</string>
+    <string name="start_eat_message">Есть</string>
+    <string name="start_fasting_message">Голодать</string>
+</resources>

@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">IntermittentFasting</string>
+    <string name="timer_fragment_title">Timer</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Settings</string>
+    <string name="start_fasting_timer">Start fasting timer!</string>
+    <string name="zero_time" translatable="false">00:00:00</string>
+    <string name="start_eating_timer">Start eating timer</string>
+    <string name="notification_channel_id">fasting timer</string>
+    <string name="its_fasting_time_message">Fasting in progress</string>
+    <string name="stop_timer">Stop timer</string>
+    <string name="timer_channel_description">Timer channel</string>
+    <string name="congratulations_channel_description">congratulations channel</string>
+    <string name="fasting_time_message">time to be hungry</string>
+    <string name="eating_time_message">Time to eat</string>
+    <string name="congratulations_3_message">Congratulations, you keep more, than 12 hours!</string>
+    <string name="congratulations_1_message">Congratulations, you keep more, than 16 hours!</string>
+    <string name="congratulations_2_message">Congratulations, you keep more, than 14 hours!</string>
+    <string name="its_eating_time_message">Eating time</string>
+    <string name="still_fasting_message">You just start fasting</string>
+    <string name="still_eating_message">You just start eat</string>
+    <string name="you_fasting_message">"You hungry "</string>
+    <string name="you_eating_message">"You eat "</string>
+    <string name="start_eat_message">Eating</string>
+    <string name="start_fasting_message">Fasting</string>
+</resources>
