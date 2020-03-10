@@ -81,7 +81,7 @@ public class TimerWorker extends Worker {
     /**
      * method to convert millisecond to time format
      */
-    private String hmsTimeFormatter(long milliSeconds) {
+    public static String hmsTimeFormatter(long milliSeconds) {
         return String.format(Locale.ENGLISH, "%02d:%02d:%02d",
                 TimeUnit.MILLISECONDS.toHours(milliSeconds),
                 TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),

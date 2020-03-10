@@ -4,14 +4,14 @@ import android.app.Application;
 import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
+import androidx.room.Room;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import net.veldor.intermittentfasting.db.AppDatabase;
 import net.veldor.intermittentfasting.utils.MyNotify;
 import net.veldor.intermittentfasting.workers.TimerWorker;
-
-import java.util.HashMap;
 
 public class App extends Application {
     public static final String FASTING_TIMER = "fasting timer";
@@ -25,6 +25,7 @@ public class App extends Application {
     private static SharedPreferences mSharedPreferences;
     private static MyNotify mNotify;
     public boolean isFasting;
+    private static AppDatabase mDatabase;
 
     @Override
     public void onCreate() {
@@ -32,10 +33,18 @@ public class App extends Application {
         instance = this;
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mNotify = new MyNotify();
+        mDatabase = Room.databaseBuilder(getApplicationContext(),
+                        AppDatabase.class, "database")
+                        .allowMainThreadQueries()
+                        .build();
     }
 
     public static App getInstance() {
         return instance;
+    }
+
+    public static AppDatabase getDb() {
+        return mDatabase;
     }
 
     public static SharedPreferences getPreferences() {

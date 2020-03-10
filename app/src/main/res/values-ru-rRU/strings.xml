@@ -16,8 +16,8 @@
     <string name="its_eating_time_message">Пищевое окно</string>
     <string name="still_fasting_message">Вы только что начали голодать</string>
     <string name="still_eating_message">Только что началось пищевое окно</string>
-    <string name="you_fasting_message">"\"Вы голодаете "</string>
-    <string name="you_eating_message">"\"Пищевое окно длится  "</string>
+    <string name="you_fasting_message">"Вы голодаете "</string>
+    <string name="you_eating_message">"Пищевое окно длится  "</string>
     <string name="start_eat_message">Есть</string>
     <string name="start_fasting_message">Голодать</string>
 </resources>

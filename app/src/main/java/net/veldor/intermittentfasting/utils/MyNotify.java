@@ -8,12 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
 import net.veldor.intermittentfasting.App;
+import net.veldor.intermittentfasting.MainActivity;
 import net.veldor.intermittentfasting.R;
 import net.veldor.intermittentfasting.receivers.MiscActionsReceiver;
+import net.veldor.intermittentfasting.workers.TimerWorker;
 
 import static net.veldor.intermittentfasting.receivers.MiscActionsReceiver.EXTRA_ACTION_TYPE;
 
@@ -22,6 +25,8 @@ public class MyNotify {
     private static final String CONGRATS_CHANNEL_ID = "congrats";
     private static final int START_EAT_CODE = 1;
     private static final int START_FASTING_CODE = 2;
+    private static final int OPEN_APP_CODE = 3;
+    private static final int PERIOD_FINISHED_NOTIFICATION = 4;
     private final App mContext;
     private final NotificationManager mNotificationManager;
     private NotificationCompat.Builder timerNotification;
@@ -40,8 +45,7 @@ public class MyNotify {
                 // создам канал уведомлений таймера отсчёта
                 NotificationChannel nc = new NotificationChannel(TIMER_CHANNEL_ID, mContext.getString(R.string.timer_channel_description), NotificationManager.IMPORTANCE_DEFAULT);
                 nc.setDescription(mContext.getString(R.string.timer_channel_description));
-                nc.enableLights(true);
-                nc.setLightColor(Color.RED);
+                nc.enableLights(false);
                 nc.enableVibration(true);
                 mNotificationManager.createNotificationChannel(nc);
 
@@ -67,6 +71,11 @@ public class MyNotify {
     }
 
     public Notification getTimerNotification(PendingIntent intent) {
+        // добавлю интент, который будет запускать приложение при клике на уведомление
+        // добавлю интент для отображения экрана очереди скачивания
+        Intent openAppIntent = new Intent(mContext, MainActivity.class);
+        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent openAppPendingIntent = PendingIntent.getActivity(mContext, OPEN_APP_CODE, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         // проверю, какой сейчас период
         boolean isFasting = App.getInstance().isFasting;
         if(isFasting){
@@ -100,6 +109,7 @@ public class MyNotify {
                     // be used to cancel the worker
                     .addAction(R.drawable.ic_pan_tool_black_24dp, mContext.getString(R.string.start_fasting_message), startFastingPendingIntent);
         }
+        timerNotification.setContentIntent(openAppPendingIntent);
         return timerNotification.build();
     }
 
@@ -112,5 +122,36 @@ public class MyNotify {
         Notification notification = notificationBuilder.build();
         mNotificationManager.notify(mLastNotificationId, notification);
         mLastNotificationId++;
+    }
+
+    public void sendPeriodFinishedNotification() {
+        // при нажатии на окно или на экшн- перейду в статистику
+        Intent openAppIntent = new Intent(mContext, MainActivity.class);
+        openAppIntent.putExtra(MainActivity.START_FRAGMENT, MainActivity.START_STATISTICS);
+        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent openAppPendingIntent = PendingIntent.getActivity(mContext, OPEN_APP_CODE, openAppIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        // посчитаю, сколько времени прошло в периоде
+        long startTime = App.getPreferences().getLong(App.FASTING_TIMER, 0);
+        if(startTime > 0){
+            long difference = System.currentTimeMillis() - startTime;
+            String spendTime = TimerWorker.hmsTimeFormatter(difference);
+            String message;
+            if(App.getInstance().isFasting){
+                message = "Вы голодали " + spendTime;
+            }
+            else{
+                message = "Пищевое окно длилось " + spendTime;
+            }
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, CONGRATS_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_battery_full_black_24dp)
+                    .setContentTitle("Завершён период")
+                    .setContentIntent(openAppPendingIntent)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                    .addAction(R.drawable.ic_pan_tool_black_24dp, "Statistics", openAppPendingIntent)
+                    .setAutoCancel(true);
+            Notification notification = notificationBuilder.build();
+            mNotificationManager.notify(PERIOD_FINISHED_NOTIFICATION, notification);
+            mLastNotificationId++;
+        }
     }
 }

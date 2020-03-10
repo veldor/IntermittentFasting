@@ -1,11 +1,12 @@
 package net.veldor.intermittentfasting.receivers;
 
+import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import net.veldor.intermittentfasting.App;
+import net.veldor.intermittentfasting.db.DbQueries;
 
 public class MiscActionsReceiver extends BroadcastReceiver {
     public static final String EXTRA_ACTION_TYPE = "action type";
@@ -18,14 +19,13 @@ public class MiscActionsReceiver extends BroadcastReceiver {
         if(action != null){
             switch (action){
                 case ACTION_START_EATING:
-                    // запущу период пищевого окна
-                    App.getInstance().isFasting = false;
-                    App.getInstance().startTimer();
-                    break;
                 case ACTION_START_FASTING:
-                        // запущу период голодания
-                    App.getInstance().isFasting = true;
+                    DbQueries.saveCurrentPeriod();
+                    App.getNotifier().sendPeriodFinishedNotification();
+                    // запущу период пищевого окна
+                    App.getInstance().isFasting = !App.getInstance().isFasting;
                     App.getInstance().startTimer();
+                    // покажу уведомление о завершении прогресса
                     break;
             }
         }

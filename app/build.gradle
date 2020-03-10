@@ -40,4 +40,8 @@ dependencies {
     implementation "androidx.preference:preference:1.1.0"
 
     implementation 'androidx.work:work-runtime:2.3.2'
+
+    implementation 'androidx.room:room-runtime:2.2.4'
+    annotationProcessor 'androidx.room:room-compiler:2.2.4'
+    implementation 'org.jetbrains:annotations-java5:15.0'
 }

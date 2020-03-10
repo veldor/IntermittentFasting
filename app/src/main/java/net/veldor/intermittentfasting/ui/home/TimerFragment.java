@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import net.veldor.intermittentfasting.App;
 import net.veldor.intermittentfasting.R;
+import net.veldor.intermittentfasting.db.DbQueries;
 
 import java.util.List;
 import java.util.Locale;
@@ -65,6 +66,7 @@ public class TimerFragment extends Fragment {
         mStartFastingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DbQueries.saveCurrentPeriod();
                 // зарегистрирую время начала таймера
                 App.getInstance().isFasting = true;
                 App.getInstance().startTimer();
@@ -81,6 +83,7 @@ public class TimerFragment extends Fragment {
         mStartEatingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DbQueries.saveCurrentPeriod();
                 App.getInstance().isFasting = false;
                 App.getInstance().startTimer();
                 mTimeView.setText(hmsTimeFormatter(0));
