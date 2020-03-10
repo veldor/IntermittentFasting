@@ -23,4 +23,8 @@
     <string name="you_eating_message">"You eat "</string>
     <string name="start_eat_message">Eating</string>
     <string name="start_fasting_message">Fasting</string>
+    <string name="statistics_message">Statistics</string>
+    <string name="fasting_timing_message">You hungry by</string>
+    <string name="eating_timing_message">You eat by</string>
+    <string name="period_finish_message">Switch period</string>
 </resources>

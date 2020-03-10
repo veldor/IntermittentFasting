@@ -4,14 +4,22 @@ import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import net.veldor.intermittentfasting.App;
+import net.veldor.intermittentfasting.MainActivity;
 import net.veldor.intermittentfasting.db.DbQueries;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
+import static net.veldor.intermittentfasting.utils.MyNotify.PERIOD_FINISHED_NOTIFICATION;
 
 public class MiscActionsReceiver extends BroadcastReceiver {
     public static final String EXTRA_ACTION_TYPE = "action type";
-    public static final String ACTION_START_EATING = "cancel download";
-    public static final String ACTION_START_FASTING = "pause download";
+    public static final String ACTION_START_EATING = "start eating";
+    public static final String ACTION_START_FASTING = "start fasting";
+    public static final String ACTION_SHOW_STAT = "show stat";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -26,6 +34,16 @@ public class MiscActionsReceiver extends BroadcastReceiver {
                     App.getInstance().isFasting = !App.getInstance().isFasting;
                     App.getInstance().startTimer();
                     // покажу уведомление о завершении прогресса
+                    break;
+                case ACTION_SHOW_STAT:
+                    // Отменю уведомление
+                    if (App.getNotifier().mNotificationManager != null) {
+                        App.getNotifier().mNotificationManager.cancel(PERIOD_FINISHED_NOTIFICATION);
+                    }
+                    Intent showStatIntent = new Intent(App.getInstance(), MainActivity.class);
+                    showStatIntent.putExtra(MainActivity.START_FRAGMENT, MainActivity.START_STATISTICS);
+                    showStatIntent.setFlags(FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_SINGLE_TOP|FLAG_ACTIVITY_CLEAR_TOP);
+                    App.getInstance().startActivity(showStatIntent);
                     break;
             }
         }

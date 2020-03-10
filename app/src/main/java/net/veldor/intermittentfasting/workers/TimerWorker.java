@@ -61,7 +61,7 @@ public class TimerWorker extends Worker {
                 notifier.sendCongratulationsNotification(mContext.getString(R.string.congratulations_3_message));
                 preferences.edit().putBoolean(App.GOOD_WORK, true).apply();
             }
-            SystemClock.sleep(10000);
+            SystemClock.sleep(1000);
         }
         return Result.retry();
     }

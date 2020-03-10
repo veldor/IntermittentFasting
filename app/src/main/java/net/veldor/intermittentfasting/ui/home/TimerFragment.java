@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.work.WorkInfo;
@@ -53,7 +54,12 @@ public class TimerFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_timer, container, false);
         mActivity = getActivity();
         setupUI(root);
+        setupObservers();
         return root;
+    }
+
+    private void setupObservers() {
+        // буду отслеживать изменение периода, если он меняется- перезапущу таймер
     }
 
     private void setupUI(View root) {
@@ -96,33 +102,31 @@ public class TimerFragment extends Fragment {
             }
         });
 
-        try {
-            // проверю статус таймера
-            ListenableFuture<List<WorkInfo>> timerWorkerStatus = WorkManager.getInstance(mActivity).getWorkInfosForUniqueWork(TIME_WORKER);
-            List<WorkInfo> status = timerWorkerStatus.get();
-            if (status != null && status.size() > 0) {
-                Log.d("surprise", "TimerFragment setupUI: timer status is " + status.get(0).getState());
-                // если таймер запущен, выясню, какой из двух- таймер голодания или еды
-                if(status.get(0).getState().equals(WorkInfo.State.RUNNING) || status.get(0).getState().equals(WorkInfo.State.ENQUEUED )){
-                    startTimer();
-                    if(App.getInstance().isFasting){
-                        // если период голодания- покажу таймер включения периода еды
-                        mStartEatingBtn.setVisibility(View.VISIBLE);
-                        mStartFastingBtn.setVisibility(View.INVISIBLE);
-                        mCurrentTime.setText(R.string.fasting_time_message);
-                        itsFastingTime();
-                    }
-                    else{
-                        mStartEatingBtn.setVisibility(View.INVISIBLE);
-                        mStartFastingBtn.setVisibility(View.VISIBLE);
-                        mCurrentTime.setText(R.string.eating_time_message);
-                        itsEatingTime();
+        // проверю статус таймера
+        LiveData<List<WorkInfo>> timerWorkerStatus = WorkManager.getInstance(mActivity).getWorkInfosForUniqueWorkLiveData(TIME_WORKER);
+        timerWorkerStatus.observe(mActivity, new Observer<List<WorkInfo>>() {
+            @Override
+            public void onChanged(List<WorkInfo> status) {
+                if (status != null && status.size() > 0) {
+                    // если таймер запущен, выясню, какой из двух- таймер голодания или еды
+                    if (status.get(0).getState().equals(WorkInfo.State.RUNNING) || status.get(0).getState().equals(WorkInfo.State.ENQUEUED)) {
+                        startTimer();
+                        if (App.getInstance().isFasting) {
+                            // если период голодания- покажу таймер включения периода еды
+                            mStartEatingBtn.setVisibility(View.VISIBLE);
+                            mStartFastingBtn.setVisibility(View.INVISIBLE);
+                            mCurrentTime.setText(R.string.fasting_time_message);
+                            itsFastingTime();
+                        } else {
+                            mStartEatingBtn.setVisibility(View.INVISIBLE);
+                            mStartFastingBtn.setVisibility(View.VISIBLE);
+                            mCurrentTime.setText(R.string.eating_time_message);
+                            itsEatingTime();
+                        }
                     }
                 }
             }
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private void startTimer() {
@@ -186,12 +190,13 @@ public class TimerFragment extends Fragment {
                 TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds)));
     }
 
-    private void itsFastingTime(){
+    private void itsFastingTime() {
         mTimeView.setTextColor(getResources().getColor(R.color.danger_color));
         mCurrentTime.setTextColor(getResources().getColor(R.color.danger_color));
         mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_circle_danger_color));
     }
-    private void itsEatingTime(){
+
+    private void itsEatingTime() {
         mTimeView.setTextColor(getResources().getColor(R.color.colorAccent));
         mCurrentTime.setTextColor(getResources().getColor(R.color.colorAccent));
         mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_circle_yellow));

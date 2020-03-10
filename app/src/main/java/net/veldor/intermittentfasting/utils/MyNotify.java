@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -25,10 +24,11 @@ public class MyNotify {
     private static final String CONGRATS_CHANNEL_ID = "congrats";
     private static final int START_EAT_CODE = 1;
     private static final int START_FASTING_CODE = 2;
+    private static final int SHOW_STAT_CODE = 3;
     private static final int OPEN_APP_CODE = 3;
-    private static final int PERIOD_FINISHED_NOTIFICATION = 4;
+    public static final int PERIOD_FINISHED_NOTIFICATION = 4;
     private final App mContext;
-    private final NotificationManager mNotificationManager;
+    public final NotificationManager mNotificationManager;
     private NotificationCompat.Builder timerNotification;
     private int mLastNotificationId = 100;
 
@@ -126,10 +126,9 @@ public class MyNotify {
 
     public void sendPeriodFinishedNotification() {
         // при нажатии на окно или на экшн- перейду в статистику
-        Intent openAppIntent = new Intent(mContext, MainActivity.class);
-        openAppIntent.putExtra(MainActivity.START_FRAGMENT, MainActivity.START_STATISTICS);
-        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent openAppPendingIntent = PendingIntent.getActivity(mContext, OPEN_APP_CODE, openAppIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent showStatIntent = new Intent(mContext, MiscActionsReceiver.class);
+        showStatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_SHOW_STAT);
+        PendingIntent openAppPendingIntent = PendingIntent.getBroadcast(mContext, SHOW_STAT_CODE, showStatIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         // посчитаю, сколько времени прошло в периоде
         long startTime = App.getPreferences().getLong(App.FASTING_TIMER, 0);
         if(startTime > 0){
@@ -137,17 +136,17 @@ public class MyNotify {
             String spendTime = TimerWorker.hmsTimeFormatter(difference);
             String message;
             if(App.getInstance().isFasting){
-                message = "Вы голодали " + spendTime;
+                message = mContext.getString(R.string.fasting_timing_message) + spendTime;
             }
             else{
-                message = "Пищевое окно длилось " + spendTime;
+                message = mContext.getString(R.string.eating_timing_message) + spendTime;
             }
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, CONGRATS_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_battery_full_black_24dp)
-                    .setContentTitle("Завершён период")
+                    .setContentTitle(mContext.getString(R.string.period_finish_message))
                     .setContentIntent(openAppPendingIntent)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                    .addAction(R.drawable.ic_pan_tool_black_24dp, "Statistics", openAppPendingIntent)
+                    .addAction(R.drawable.ic_pan_tool_black_24dp, mContext.getString(R.string.statistics_message), openAppPendingIntent)
                     .setAutoCancel(true);
             Notification notification = notificationBuilder.build();
             mNotificationManager.notify(PERIOD_FINISHED_NOTIFICATION, notification);
