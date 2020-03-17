@@ -20,6 +20,8 @@ public class MiscActionsReceiver extends BroadcastReceiver {
     public static final String ACTION_START_EATING = "start eating";
     public static final String ACTION_START_FASTING = "start fasting";
     public static final String ACTION_SHOW_STAT = "show stat";
+    public static final String ACTION_I_EAT = "i eat";
+    public static final String ACTION_I_I_DRINK = "i drink";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -44,6 +46,12 @@ public class MiscActionsReceiver extends BroadcastReceiver {
                     showStatIntent.putExtra(MainActivity.START_FRAGMENT, MainActivity.START_STATISTICS);
                     showStatIntent.setFlags(FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_SINGLE_TOP|FLAG_ACTIVITY_CLEAR_TOP);
                     App.getInstance().startActivity(showStatIntent);
+                    break;
+                case ACTION_I_EAT:
+                    App.iEat();
+                    break;
+                case ACTION_I_I_DRINK:
+                    App.iDrink();
                     break;
             }
         }

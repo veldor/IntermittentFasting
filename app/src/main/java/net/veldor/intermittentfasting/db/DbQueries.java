@@ -1,7 +1,12 @@
 package net.veldor.intermittentfasting.db;
 
+import android.util.Log;
+
 import net.veldor.intermittentfasting.App;
+import net.veldor.intermittentfasting.db.dao.EatDao;
 import net.veldor.intermittentfasting.db.dao.PeriodDao;
+import net.veldor.intermittentfasting.db.entity.Drink;
+import net.veldor.intermittentfasting.db.entity.Eat;
 import net.veldor.intermittentfasting.db.entity.Period;
 
 import static net.veldor.intermittentfasting.App.FASTING_TIMER;
@@ -26,5 +31,24 @@ public class DbQueries {
             period.periodFinish = System.currentTimeMillis();
             dao.insert(period);
         }
+    }
+
+    public static void saveEat() {
+        Eat newEat = new Eat();
+        newEat.eatTime = System.currentTimeMillis();
+        App.getDb().eatDao().insert(newEat);
+    }
+    public static void saveDrink() {
+        Drink newDrink = new Drink();
+        newDrink.drinkTime = System.currentTimeMillis();
+        App.getDb().drinkDao().insert(newDrink);
+    }
+
+    public static Eat getLastEat() {
+        return App.getDb().eatDao().getLastEat();
+    }
+
+    public static Drink getLastDrink() {
+        return App.getDb().drinkDao().getLastDrink();
     }
 }

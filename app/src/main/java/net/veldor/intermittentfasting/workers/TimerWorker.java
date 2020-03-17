@@ -34,7 +34,6 @@ public class TimerWorker extends Worker {
         notifier = App.getNotifier();
         // помечу рабочего важным
         ForegroundInfo info = createForegroundInfo();
-        int notificationId = info.getNotificationId();
         setForegroundAsync(info);
         SharedPreferences preferences = App.getPreferences();
         long startTime;
@@ -43,7 +42,7 @@ public class TimerWorker extends Worker {
             // проверю, сколько времени прошло с момента старта таймера
             currentTime = System.currentTimeMillis();
             long difference = currentTime - startTime;
-            notifier.setSpendTime(notificationId, hmsTimeFormatter(difference));
+            notifier.setSpendTime(MyNotify.TIMER_NOTIFICATION, hmsTimeFormatter(difference));
 
             // проверю достижения
             if(!App.getInstance().isFasting && difference > 1000 * 60 * 60 * 16 && !preferences.getBoolean(App.INCREDIBLE_WORK, false)){
@@ -70,11 +69,8 @@ public class TimerWorker extends Worker {
     private ForegroundInfo createForegroundInfo() {
         // Build a notification
         Context context = getApplicationContext();
-        // This PendingIntent can be used to cancel the worker
-        PendingIntent intent = WorkManager.getInstance(context)
-                .createCancelPendingIntent(getId());
-        Notification notification = notifier.getTimerNotification(intent);
-        return new ForegroundInfo(1, notification);
+        Notification notification = notifier.getTimerNotification();
+        return new ForegroundInfo(MyNotify.TIMER_NOTIFICATION, notification);
     }
 
 

@@ -27,4 +27,8 @@
     <string name="fasting_timing_message">You hungry by</string>
     <string name="eating_timing_message">You eat by</string>
     <string name="period_finish_message">Switch period</string>
+    <string name="last_eat_time_message">Last you eat: %s ago</string>
+    <string name="i_eat_message">I eat</string>
+    <string name="i_drink_message">I drink</string>
+    <string name="last_drink_time_message">Last you drink: %s ago</string>
 </resources>

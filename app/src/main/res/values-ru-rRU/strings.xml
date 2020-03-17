@@ -25,4 +25,10 @@
     <string name="period_finish_message">Завершён период</string>
     <string name="stop_timer">Остановить таймер</string>
     <string name="statistics_message">Статистика</string>
+    <string name="last_eat_time_message">Последний раз вы ели %s назад</string>
+    <string name="congratulations_channel_description">Канал с достижениями</string>
+    <string name="timer_channel_description">Канал таймера</string>
+    <string name="i_eat_message">Я поел</string>
+    <string name="i_drink_message">Я попил</string>
+    <string name="last_drink_time_message">Последний раз вы пили %s назад</string>
 </resources>

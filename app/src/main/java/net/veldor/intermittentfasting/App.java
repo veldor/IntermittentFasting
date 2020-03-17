@@ -10,6 +10,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import net.veldor.intermittentfasting.db.AppDatabase;
+import net.veldor.intermittentfasting.db.DbQueries;
 import net.veldor.intermittentfasting.utils.MyNotify;
 import net.veldor.intermittentfasting.workers.TimerWorker;
 
@@ -27,6 +28,15 @@ public class App extends Application {
     public boolean isFasting;
     private static AppDatabase mDatabase;
 
+    public static void iEat() {
+        // занесу в базу данных запись о еде
+        DbQueries.saveEat();
+    }
+
+    public static void iDrink() {
+        DbQueries.saveDrink();
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -34,9 +44,10 @@ public class App extends Application {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mNotify = new MyNotify();
         mDatabase = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "database")
-                        .allowMainThreadQueries()
-                        .build();
+                AppDatabase.class, "database")
+                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+                .allowMainThreadQueries()
+                .build();
     }
 
     public static App getInstance() {
@@ -50,7 +61,8 @@ public class App extends Application {
     public static SharedPreferences getPreferences() {
         return mSharedPreferences;
     }
-    public static MyNotify getNotifier(){
+
+    public static MyNotify getNotifier() {
         return mNotify;
     }
 
