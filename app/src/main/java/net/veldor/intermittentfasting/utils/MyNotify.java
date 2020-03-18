@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -55,7 +54,7 @@ public class MyNotify {
                 NotificationChannel nc = new NotificationChannel(TIMER_CHANNEL_ID, mContext.getString(R.string.timer_channel_description), NotificationManager.IMPORTANCE_DEFAULT);
                 nc.setDescription(mContext.getString(R.string.timer_channel_description));
                 nc.enableLights(false);
-                nc.enableVibration(true);
+                nc.enableVibration(false);
                 mNotificationManager.createNotificationChannel(nc);
 
                 // создам канал уведомлений поздравлений
@@ -128,6 +127,7 @@ public class MyNotify {
             timerNotification = new NotificationCompat.Builder(mContext, TIMER_CHANNEL_ID)
                     .setContentTitle(mContext.getString(R.string.its_eating_time_message))
                     .setTicker(mContext.getString(R.string.its_eating_time_message))
+                    .setVibrate(null)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.still_eating_message)))
                     .setSmallIcon(R.drawable.ic_pregnant_woman_black_24dp)
                     .setOngoing(true)

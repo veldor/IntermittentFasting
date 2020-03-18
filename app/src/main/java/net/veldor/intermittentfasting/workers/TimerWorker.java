@@ -62,6 +62,9 @@ public class TimerWorker extends Worker {
             }
             SystemClock.sleep(1000);
         }
+        if(isStopped()){
+            notifier.mNotificationManager.cancel(MyNotify.TIMER_NOTIFICATION);
+        }
         return Result.retry();
     }
 
