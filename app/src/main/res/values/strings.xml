@@ -31,4 +31,11 @@
     <string name="i_eat_message">I eat</string>
     <string name="i_drink_message">I drink</string>
     <string name="last_drink_time_message">Last you drink: %s ago</string>
+    <string name="fasting_stat_message">Fasting chart</string>
+    <string name="chart_for_day_message">Chart for day</string>
+    <string name="fasting_time_chart">You fasting time is %s (%d%%)</string>
+    <string name="time_format">%02d h %02d m %02d s</string>
+    <string name="eating_time_chart" >You eating time is %s (%d%%)</string>
+    <string name="total_eats">Total eats per day: %d</string>
+    <string name="total_drinks">Total drinks per day: %d</string>
 </resources>

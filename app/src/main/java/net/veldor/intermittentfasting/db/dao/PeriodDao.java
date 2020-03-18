@@ -23,7 +23,6 @@ public interface PeriodDao {
     @Delete
     void delete(Period period);
 
-/*    @Update
-    void update(ReadedBooks book);
-*/
+    @Query("SELECT * FROM Period WHERE periodStart > :mStartOfDay")
+    List<Period> getPeriodsFrom(long mStartOfDay);
 }

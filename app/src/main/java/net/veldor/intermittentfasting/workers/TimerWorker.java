@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.ForegroundInfo;
@@ -39,6 +40,7 @@ public class TimerWorker extends Worker {
         long startTime;
         long currentTime;
         while ((startTime = preferences.getLong(App.FASTING_TIMER, 0)) > 0 && !isStopped()){
+            Log.d("surprise", "TimerWorker doWork: tick");
             // проверю, сколько времени прошло с момента старта таймера
             currentTime = System.currentTimeMillis();
             long difference = currentTime - startTime;
@@ -65,7 +67,7 @@ public class TimerWorker extends Worker {
         if(isStopped()){
             notifier.mNotificationManager.cancel(MyNotify.TIMER_NOTIFICATION);
         }
-        return Result.retry();
+        return Result.success();
     }
 
     @NonNull
@@ -81,7 +83,7 @@ public class TimerWorker extends Worker {
      * method to convert millisecond to time format
      */
     public static String hmsTimeFormatter(long milliSeconds) {
-        return String.format(Locale.ENGLISH, "%02d:%02d:%02d",
+        return String.format(Locale.ENGLISH, App.getInstance().getString(R.string.time_format),
                 TimeUnit.MILLISECONDS.toHours(milliSeconds),
                 TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
                 TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds)));

@@ -107,21 +107,24 @@ public class TimerFragment extends Fragment {
         timerWorkerStatus.observe(mActivity, new Observer<List<WorkInfo>>() {
             @Override
             public void onChanged(List<WorkInfo> status) {
-                if (status != null && status.size() > 0) {
-                    // если таймер запущен, выясню, какой из двух- таймер голодания или еды
-                    if (status.get(0).getState().equals(WorkInfo.State.RUNNING) || status.get(0).getState().equals(WorkInfo.State.ENQUEUED)) {
-                        startTimer();
-                        if (App.getInstance().isFasting) {
-                            // если период голодания- покажу таймер включения периода еды
-                            mStartEatingBtn.setVisibility(View.VISIBLE);
-                            mStartFastingBtn.setVisibility(View.INVISIBLE);
-                            mCurrentTime.setText(R.string.fasting_time_message);
-                            itsFastingTime();
-                        } else {
-                            mStartEatingBtn.setVisibility(View.INVISIBLE);
-                            mStartFastingBtn.setVisibility(View.VISIBLE);
-                            mCurrentTime.setText(R.string.eating_time_message);
-                            itsEatingTime();
+                // проверю, что фрагмент виден
+                if(isVisible()){
+                    if (status != null && status.size() > 0) {
+                        // если таймер запущен, выясню, какой из двух- таймер голодания или еды
+                        if (status.get(0).getState().equals(WorkInfo.State.RUNNING) || status.get(0).getState().equals(WorkInfo.State.ENQUEUED)) {
+                            startTimer();
+                            if (App.getInstance().isFasting) {
+                                // если период голодания- покажу таймер включения периода еды
+                                mStartEatingBtn.setVisibility(View.VISIBLE);
+                                mStartFastingBtn.setVisibility(View.INVISIBLE);
+                                mCurrentTime.setText(R.string.fasting_time_message);
+                                itsFastingTime();
+                            } else {
+                                mStartEatingBtn.setVisibility(View.INVISIBLE);
+                                mStartFastingBtn.setVisibility(View.VISIBLE);
+                                mCurrentTime.setText(R.string.eating_time_message);
+                                itsEatingTime();
+                            }
                         }
                     }
                 }

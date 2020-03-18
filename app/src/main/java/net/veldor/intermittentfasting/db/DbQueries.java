@@ -12,8 +12,8 @@ import net.veldor.intermittentfasting.db.entity.Period;
 import static net.veldor.intermittentfasting.App.FASTING_TIMER;
 
 public class DbQueries {
-    private static final String PERIOD_FASTING = "fasting";
-    private static final String PERIOD_EATING = "eating";
+    public static final String PERIOD_FASTING = "fasting";
+    public static final String PERIOD_EATING = "eating";
 
     public static void saveCurrentPeriod() {
         // если таймер запущен- сохраняю данные о нём

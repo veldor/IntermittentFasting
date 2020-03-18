@@ -24,4 +24,7 @@ public interface EatDao {
 
     @Delete
     void delete(Eat eat);
+
+    @Query("SELECT COUNT(id)  FROM Eat WHERE eatTime > :mStartOfDay")
+    int getEatsFrom(long mStartOfDay);
 }

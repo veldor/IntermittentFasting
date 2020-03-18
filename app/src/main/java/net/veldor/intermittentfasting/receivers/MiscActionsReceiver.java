@@ -13,6 +13,7 @@ import net.veldor.intermittentfasting.db.DbQueries;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
+import static net.veldor.intermittentfasting.App.FASTING_TIMER;
 import static net.veldor.intermittentfasting.utils.MyNotify.PERIOD_FINISHED_NOTIFICATION;
 
 public class MiscActionsReceiver extends BroadcastReceiver {
@@ -25,6 +26,15 @@ public class MiscActionsReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d("surprise", "MiscActionsReceiver onReceive: receive command");
+        if (intent.getAction() != null && intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+            Log.d("surprise", "MiscActionsReceiver onReceive: receive boot completed command");
+            long startTime = App.getPreferences().getLong(FASTING_TIMER, 0);
+            if(startTime > 0){
+                App.getInstance().startTimerWorker();
+            }
+            return;
+        }
         String action = intent.getStringExtra(EXTRA_ACTION_TYPE);
         if(action != null){
             switch (action){

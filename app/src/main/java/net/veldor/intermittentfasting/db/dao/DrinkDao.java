@@ -24,4 +24,7 @@ public interface DrinkDao {
 
     @Delete
     void delete(Drink drink);
+
+    @Query("SELECT COUNT(id)  FROM Drink WHERE drinkTime > :mStartOfDay")
+    int getDrinksFrom(long mStartOfDay);
 }

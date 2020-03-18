@@ -14,9 +14,9 @@ import net.veldor.intermittentfasting.db.entity.Period;
 
 @Database(entities = {Period.class, Eat.class, Drink.class}, version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
-    abstract PeriodDao periodDao();
-    abstract EatDao eatDao();
-    abstract DrinkDao drinkDao();
+    public abstract PeriodDao periodDao();
+    public abstract EatDao eatDao();
+    public abstract DrinkDao drinkDao();
 
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override

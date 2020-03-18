@@ -71,6 +71,10 @@ public class App extends Application {
         long date = System.currentTimeMillis();
         mSharedPreferences.edit().putLong(FASTING_TIMER, date).remove(GOOD_WORK).remove(GREAT_WORK).remove(INCREDIBLE_WORK).apply();
         // запущу рабочего, отслеживающего таймер
+        startTimerWorker();
+    }
+
+    public void startTimerWorker() {
         OneTimeWorkRequest handleTimerRequest = new OneTimeWorkRequest.Builder(TimerWorker.class).addTag(TIME_WORKER).build();
         WorkManager.getInstance(this).enqueueUniqueWork(TIME_WORKER, ExistingWorkPolicy.REPLACE, handleTimerRequest);
     }

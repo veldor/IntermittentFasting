@@ -31,4 +31,11 @@
     <string name="i_eat_message">Я поел</string>
     <string name="i_drink_message">Я попил</string>
     <string name="last_drink_time_message">Последний раз вы пили %s назад</string>
+    <string name="fasting_stat_message">Статистика голодания</string>
+    <string name="chart_for_day_message">Статистика за день</string>
+    <string name="fasting_time_chart">Вы голодаете: %s (%d%%)</string>
+    <string name="time_format">%02d ч %02d м %02d с</string>
+    <string name="eating_time_chart">Пищевые окна:  %s (%d%%)</string>
+    <string name="total_eats">Вы ели %d раз</string>
+    <string name="total_drinks">Вы пили %d раз</string>
 </resources>
