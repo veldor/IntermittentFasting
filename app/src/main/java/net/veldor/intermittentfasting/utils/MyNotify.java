@@ -54,6 +54,7 @@ public class MyNotify {
                 NotificationChannel nc = new NotificationChannel(TIMER_CHANNEL_ID, mContext.getString(R.string.timer_channel_description), NotificationManager.IMPORTANCE_DEFAULT);
                 nc.setDescription(mContext.getString(R.string.timer_channel_description));
                 nc.enableLights(false);
+                nc.setSound(null, null);
                 nc.enableVibration(false);
                 mNotificationManager.createNotificationChannel(nc);
 
