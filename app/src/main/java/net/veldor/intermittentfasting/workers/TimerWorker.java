@@ -1,15 +1,11 @@
 package net.veldor.intermittentfasting.workers;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.work.ForegroundInfo;
-import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -22,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TimerWorker extends Worker {
     private final App mContext;
-    private MyNotify notifier;
 
     public TimerWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -32,10 +27,16 @@ public class TimerWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        notifier = App.getNotifier();
-        // помечу рабочего важным
-        ForegroundInfo info = createForegroundInfo();
-        setForegroundAsync(info);
+        MyNotify notifier = App.getNotifier();
+        if(App.getInstance().isFasting){
+            // уберу уведомление о пишевом окне и создам уведомление о голодании
+            notifier.cancelEatingNotification();
+            notifier.createFastingNotification();
+        }
+        else{
+            notifier.cancelFastingNotification();
+            notifier.createEatingNotification();
+        }
         SharedPreferences preferences = App.getPreferences();
         long startTime;
         long currentTime;
@@ -44,7 +45,7 @@ public class TimerWorker extends Worker {
             // проверю, сколько времени прошло с момента старта таймера
             currentTime = System.currentTimeMillis();
             long difference = currentTime - startTime;
-            notifier.setSpendTime(MyNotify.TIMER_NOTIFICATION, hmsTimeFormatter(difference));
+            notifier.setSpendTime(hmsTimeFormatter(difference));
 
             // проверю достижения
             if(!App.getInstance().isFasting && difference > 1000 * 60 * 60 * 16 && !preferences.getBoolean(App.INCREDIBLE_WORK, false)){
@@ -65,19 +66,15 @@ public class TimerWorker extends Worker {
             SystemClock.sleep(10000);
         }
         if(isStopped()){
-            notifier.mNotificationManager.cancel(MyNotify.TIMER_NOTIFICATION);
+            if(App.getInstance().isFasting){
+                notifier.cancelFastingNotification();
+            }
+            else{
+                notifier.cancelEatingNotification();
+            }
         }
         return Result.success();
     }
-
-    @NonNull
-    private ForegroundInfo createForegroundInfo() {
-        // Build a notification
-        Context context = getApplicationContext();
-        Notification notification = notifier.getTimerNotification();
-        return new ForegroundInfo(MyNotify.TIMER_NOTIFICATION, notification);
-    }
-
 
     /**
      * method to convert millisecond to time format

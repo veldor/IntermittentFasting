@@ -12,7 +12,6 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import net.veldor.intermittentfasting.App;
-import net.veldor.intermittentfasting.MainActivity;
 import net.veldor.intermittentfasting.R;
 import net.veldor.intermittentfasting.db.DbQueries;
 import net.veldor.intermittentfasting.db.entity.Drink;
@@ -34,11 +33,15 @@ public class MyNotify {
     private static final int I_EAT_CODE = 5;
     private static final int I_DRINK_CODE = 6;
     public static final int TIMER_NOTIFICATION = 1;
+    private static final int FASTING_NOTIFICATION = 2;
+    private static final int EATING_NOTIFICATION = 3;
     public static final int PERIOD_FINISHED_NOTIFICATION = 4;
     private final App mContext;
     public final NotificationManager mNotificationManager;
     private NotificationCompat.Builder timerNotification;
     private int mLastNotificationId = 100;
+    private NotificationCompat.Builder mFastingNotification;
+    private NotificationCompat.Builder mEatingNotification;
 
     public MyNotify() {
         mContext = App.getInstance();
@@ -51,7 +54,7 @@ public class MyNotify {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (mNotificationManager != null) {
                 // создам канал уведомлений таймера отсчёта
-                NotificationChannel nc = new NotificationChannel(TIMER_CHANNEL_ID, mContext.getString(R.string.timer_channel_description), NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationChannel nc = new NotificationChannel(TIMER_CHANNEL_ID, mContext.getString(R.string.timer_channel_description), NotificationManager.IMPORTANCE_LOW);
                 nc.setDescription(mContext.getString(R.string.timer_channel_description));
                 nc.enableLights(false);
                 nc.setSound(null, null);
@@ -69,7 +72,7 @@ public class MyNotify {
         }
     }
 
-    public void setSpendTime(int currentNotification, String hmsTimeFormatter) {
+    public void setSpendTime(String hmsTimeFormatter) {
         // проверю последний период еды
         Eat lastEat = DbQueries.getLastEat();
         String eatTime = "";
@@ -83,61 +86,12 @@ public class MyNotify {
             drinkTime = String.format(Locale.ENGLISH, mContext.getString(R.string.last_drink_time_message), TimerWorker.hmsTimeFormatter(System.currentTimeMillis() - lastDrink.drinkTime));
         }
         if (App.getInstance().isFasting) {
-            timerNotification.setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.you_fasting_message) + hmsTimeFormatter + "\n" + eatTime + "\n" + drinkTime));
+            mFastingNotification.setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.you_fasting_message) + hmsTimeFormatter + "\n" + eatTime + "\n" + drinkTime));
+            mNotificationManager.notify(FASTING_NOTIFICATION, mFastingNotification.build());
         } else {
-            timerNotification.setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.you_eating_message) + hmsTimeFormatter + "\n" + eatTime + "\n" + drinkTime));
+            mEatingNotification.setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.you_eating_message) + hmsTimeFormatter + "\n" + eatTime + "\n" + drinkTime));
+            mNotificationManager.notify(EATING_NOTIFICATION, mEatingNotification.build());
         }
-        mNotificationManager.notify(currentNotification, timerNotification.build());
-    }
-
-    public Notification getTimerNotification() {
-        // добавлю интент, который будет запускать приложение при клике на уведомление
-        // добавлю интент для отображения экрана очереди скачивания
-        Intent openAppIntent = new Intent(mContext, MainActivity.class);
-        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent openAppPendingIntent = PendingIntent.getActivity(mContext, OPEN_APP_CODE, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // проверю, какой сейчас период
-        boolean isFasting = App.getInstance().isFasting;
-        if (isFasting) {
-            // создам интент, который переключит таймер на пищевое окно
-            Intent startEatIntent = new Intent(mContext, MiscActionsReceiver.class);
-            startEatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_START_EATING);
-            PendingIntent startEatPendingIntent = PendingIntent.getBroadcast(mContext, START_EAT_CODE, startEatIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            timerNotification = new NotificationCompat.Builder(mContext, TIMER_CHANNEL_ID)
-                    .setContentTitle(mContext.getString(R.string.its_fasting_time_message))
-                    .setTicker(mContext.getString(R.string.its_fasting_time_message))
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.still_fasting_message)))
-                    .setSmallIcon(R.drawable.ic_pan_tool_black_24dp)
-                    .setOngoing(true)
-                    // Add the cancel action to the notification which can
-                    // be used to cancel the worker
-                    .addAction(R.drawable.ic_pregnant_woman_black_24dp, mContext.getString(R.string.start_eat_message), startEatPendingIntent);
-        } else {
-            // создам интент, который отправит событие о еде
-            Intent iEatIntent = new Intent(mContext, MiscActionsReceiver.class);
-            iEatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_I_EAT);
-            PendingIntent iEatPendingIntent = PendingIntent.getBroadcast(mContext, I_EAT_CODE, iEatIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            // создам интент, который отправит событие о питье
-            Intent iDrinkIntent = new Intent(mContext, MiscActionsReceiver.class);
-            iDrinkIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_I_I_DRINK);
-            PendingIntent iDrinkPendingIntent = PendingIntent.getBroadcast(mContext, I_DRINK_CODE, iDrinkIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            // создам интент, который переключит таймер на голодание
-            Intent startFastingIntent = new Intent(mContext, MiscActionsReceiver.class);
-            startFastingIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_START_FASTING);
-            PendingIntent startFastingPendingIntent = PendingIntent.getBroadcast(mContext, START_FASTING_CODE, startFastingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            timerNotification = new NotificationCompat.Builder(mContext, TIMER_CHANNEL_ID)
-                    .setContentTitle(mContext.getString(R.string.its_eating_time_message))
-                    .setTicker(mContext.getString(R.string.its_eating_time_message))
-                    .setVibrate(null)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.still_eating_message)))
-                    .setSmallIcon(R.drawable.ic_pregnant_woman_black_24dp)
-                    .setOngoing(true)
-                    .addAction(R.drawable.ic_free_breakfast_black_24dp, mContext.getString(R.string.i_eat_message), iEatPendingIntent)
-                    .addAction(R.drawable.ic_free_breakfast_black_24dp, mContext.getString(R.string.i_drink_message), iDrinkPendingIntent)
-                    .addAction(R.drawable.ic_pan_tool_black_24dp, mContext.getString(R.string.start_fasting_message), startFastingPendingIntent);
-        }
-        timerNotification.setContentIntent(openAppPendingIntent);
-        return timerNotification.build();
     }
 
     public void sendCongratulationsNotification(String s) {
@@ -178,5 +132,56 @@ public class MyNotify {
             mNotificationManager.notify(PERIOD_FINISHED_NOTIFICATION, notification);
             mLastNotificationId++;
         }
+    }
+
+    public void createFastingNotification() {
+        // создам интент, который переключит таймер на пищевое окно
+        Intent startEatIntent = new Intent(mContext, MiscActionsReceiver.class);
+        startEatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_START_EATING);
+        PendingIntent startEatPendingIntent = PendingIntent.getBroadcast(mContext, START_EAT_CODE, startEatIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        timerNotification = new NotificationCompat.Builder(mContext, TIMER_CHANNEL_ID)
+                .setContentTitle(mContext.getString(R.string.its_fasting_time_message))
+                .setTicker(mContext.getString(R.string.its_fasting_time_message))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.still_fasting_message)))
+                .setSmallIcon(R.drawable.ic_pan_tool_black_24dp)
+                .setOngoing(true)
+                .addAction(R.drawable.ic_pregnant_woman_black_24dp, mContext.getString(R.string.start_eat_message), startEatPendingIntent);
+        mFastingNotification = timerNotification;
+        mNotificationManager.notify(FASTING_NOTIFICATION, timerNotification.build());
+    }
+
+    public void cancelFastingNotification() {
+        mNotificationManager.cancel(FASTING_NOTIFICATION);
+    }
+
+    public void createEatingNotification() {
+        // создам интент, который отправит событие о еде
+        Intent iEatIntent = new Intent(mContext, MiscActionsReceiver.class);
+        iEatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_I_EAT);
+        PendingIntent iEatPendingIntent = PendingIntent.getBroadcast(mContext, I_EAT_CODE, iEatIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // создам интент, который отправит событие о питье
+        Intent iDrinkIntent = new Intent(mContext, MiscActionsReceiver.class);
+        iDrinkIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_I_I_DRINK);
+        PendingIntent iDrinkPendingIntent = PendingIntent.getBroadcast(mContext, I_DRINK_CODE, iDrinkIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // создам интент, который переключит таймер на голодание
+        Intent startFastingIntent = new Intent(mContext, MiscActionsReceiver.class);
+        startFastingIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_START_FASTING);
+        PendingIntent startFastingPendingIntent = PendingIntent.getBroadcast(mContext, START_FASTING_CODE, startFastingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        timerNotification = new NotificationCompat.Builder(mContext, TIMER_CHANNEL_ID)
+                .setContentTitle(mContext.getString(R.string.its_eating_time_message))
+                .setTicker(mContext.getString(R.string.its_eating_time_message))
+                .setVibrate(null)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.still_eating_message)))
+                .setSmallIcon(R.drawable.ic_pregnant_woman_black_24dp)
+                .setOngoing(true)
+                .addAction(R.drawable.ic_free_breakfast_black_24dp, mContext.getString(R.string.i_eat_message), iEatPendingIntent)
+                .addAction(R.drawable.ic_free_breakfast_black_24dp, mContext.getString(R.string.i_drink_message), iDrinkPendingIntent)
+                .addAction(R.drawable.ic_pan_tool_black_24dp, mContext.getString(R.string.start_fasting_message), startFastingPendingIntent);
+        mEatingNotification = timerNotification;
+        mNotificationManager.notify(EATING_NOTIFICATION, timerNotification.build());
+    }
+
+    public void cancelEatingNotification() {
+        mNotificationManager.cancel(EATING_NOTIFICATION);
     }
 }

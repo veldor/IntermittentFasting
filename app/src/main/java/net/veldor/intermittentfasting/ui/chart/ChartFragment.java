@@ -53,8 +53,8 @@ public class ChartFragment extends Fragment {
             long eatingTime = mViewModel.getTotalEatingTime();
             // посчитаю соотношение периодов в %
             long eatingPercent = MyFormatter.countPercent(eatingTime, fastingTime);
-            mTotalFastingTimeView.setText(String.format(Locale.ENGLISH, getContext().getString(R.string.fasting_time_chart), TimerWorker.hmsTimeFormatter(fastingTime), eatingPercent));
-            mTotalEatingTimeView.setText(String.format(Locale.ENGLISH, getContext().getString(R.string.eating_time_chart), TimerWorker.hmsTimeFormatter(eatingTime), 100 - eatingPercent));
+            mTotalFastingTimeView.setText(String.format(Locale.ENGLISH, getContext().getString(R.string.fasting_time_chart), TimerWorker.hmsTimeFormatter(fastingTime), 100 - eatingPercent));
+            mTotalEatingTimeView.setText(String.format(Locale.ENGLISH, getContext().getString(R.string.eating_time_chart), TimerWorker.hmsTimeFormatter(eatingTime), eatingPercent));
             // посчитаю количество фактов еды за день
             int eatCount = mViewModel.getEats();
             int drinksCount = mViewModel.getDrinks();
