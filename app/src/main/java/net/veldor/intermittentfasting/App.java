@@ -20,12 +20,12 @@ public class App extends Application {
     public static final String GREAT_WORK = "great work";
     public static final String GOOD_WORK = "good work";
     public static final String INCREDIBLE_WORK = "incredible work";
+    private static final String PREFERENCE_IS_FASTING = "fasting";
 
 
     private static App instance;
     private static SharedPreferences mSharedPreferences;
     private static MyNotify mNotify;
-    public boolean isFasting;
     private static AppDatabase mDatabase;
 
     public static void iEat() {
@@ -35,6 +35,14 @@ public class App extends Application {
 
     public static void iDrink() {
         DbQueries.saveDrink();
+    }
+
+    public boolean isFasting(){
+        return mSharedPreferences.getBoolean(PREFERENCE_IS_FASTING, true);
+    }
+
+    public void switchFasting(boolean fasting){
+        mSharedPreferences.edit().putBoolean(PREFERENCE_IS_FASTING, fasting).apply();
     }
 
     @Override
@@ -48,6 +56,7 @@ public class App extends Application {
                 .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
                 .allowMainThreadQueries()
                 .build();
+        startTimerWorker();
     }
 
     public static App getInstance() {
@@ -79,7 +88,7 @@ public class App extends Application {
         WorkManager.getInstance(this).enqueueUniqueWork(TIME_WORKER, ExistingWorkPolicy.REPLACE, handleTimerRequest);
     }
 
-    public void stopTimer() {
+    /*public void stopTimer() {
         mSharedPreferences.edit().remove(FASTING_TIMER).apply();
-    }
+    }*/
 }

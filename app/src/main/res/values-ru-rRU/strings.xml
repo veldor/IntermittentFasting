@@ -11,7 +11,6 @@
     <string name="congratulations_1_message">Поздравляем, вы продержались больше 16 часов!</string>
     <string name="congratulations_2_message">Поздравляем, вы продержались больше 14 часов!</string>
     <string name="congratulations_3_message">Поздравляем, вы продержались больше 12 часов!</string>
-    <string name="notification_channel_id">Уведомления таймера</string>
     <string name="its_fasting_time_message">Время голода</string>
     <string name="its_eating_time_message">Пищевое окно</string>
     <string name="still_fasting_message">Вы только что начали голодать</string>
@@ -23,7 +22,6 @@
     <string name="fasting_timing_message">\"Вы голодали \"</string>
     <string name="eating_timing_message">\"Пищевое окно длилось \"</string>
     <string name="period_finish_message">Завершён период</string>
-    <string name="stop_timer">Остановить таймер</string>
     <string name="statistics_message">Статистика</string>
     <string name="last_eat_time_message">Последний раз вы ели %s назад</string>
     <string name="congratulations_channel_description">Канал с достижениями</string>
@@ -38,4 +36,6 @@
     <string name="eating_time_chart">Пищевые окна:  %s (%d%%)</string>
     <string name="total_eats">Вы ели %d раз</string>
     <string name="total_drinks">Вы пили %d раз</string>
+    <string name="you_eat_congrat">Рад, что вы поели</string>
+    <string name="you_drink_congrat">Отлично, что вы выпили</string>
 </resources>

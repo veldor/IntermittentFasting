@@ -1,8 +1,7 @@
 package net.veldor.intermittentfasting.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,35 +18,36 @@ import androidx.lifecycle.Observer;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
 import net.veldor.intermittentfasting.App;
 import net.veldor.intermittentfasting.R;
 import net.veldor.intermittentfasting.db.DbQueries;
+import net.veldor.intermittentfasting.receivers.MiscActionsReceiver;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static net.veldor.intermittentfasting.App.TIME_WORKER;
+import static net.veldor.intermittentfasting.receivers.MiscActionsReceiver.EXTRA_ACTION_TYPE;
 
 public class TimerFragment extends Fragment {
 
 
     private ProgressBar mProgressBar;
     private Button mStartFastingBtn, mStartEatingBtn;
-    private CountDownTimer mCountDownTimer;
+    //private CountDownTimer mCountDownTimer;
     private TextView mTimeView;
-    private long mTimeCountInMilliSeconds = 60000;
+    //private long mTimeCountInMilliSeconds = 60000;
 
     private MutableLiveData<String> mSpendTime = new MutableLiveData<>();
     private Timer mTimer;
     private FragmentActivity mActivity;
     private long mTimerStart;
     private TextView mCurrentTime;
+    private Button mIEatBtn;
+    private Button mIDrinkBtn;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -68,13 +68,15 @@ public class TimerFragment extends Fragment {
         mStartEatingBtn = root.findViewById(R.id.StartEatingTimerBtn);
         mTimeView = root.findViewById(R.id.textViewTime);
         mCurrentTime = root.findViewById(R.id.currentTime);
+        mIEatBtn = root.findViewById(R.id.iEatButton);
+        mIDrinkBtn = root.findViewById(R.id.iDrinkButton);
 
         mStartFastingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DbQueries.saveCurrentPeriod();
                 // зарегистрирую время начала таймера
-                App.getInstance().isFasting = true;
+                App.getInstance().switchFasting(true);
                 App.getInstance().startTimer();
                 mTimeView.setText(hmsTimeFormatter(0));
                 mTimerStart = App.getPreferences().getLong(App.FASTING_TIMER, 0);
@@ -90,7 +92,7 @@ public class TimerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 DbQueries.saveCurrentPeriod();
-                App.getInstance().isFasting = false;
+                App.getInstance().switchFasting(false);
                 App.getInstance().startTimer();
                 mTimeView.setText(hmsTimeFormatter(0));
                 mTimerStart = App.getPreferences().getLong(App.FASTING_TIMER, 0);
@@ -102,18 +104,35 @@ public class TimerFragment extends Fragment {
             }
         });
 
+        mIEatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent iEatIntent = new Intent(getContext(), MiscActionsReceiver.class);
+                iEatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_I_EAT);
+                App.getInstance().sendBroadcast(iEatIntent);
+            }
+        });
+        mIDrinkBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent iDrinkIntent = new Intent(getContext(), MiscActionsReceiver.class);
+                iDrinkIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_I_I_DRINK);
+                App.getInstance().sendBroadcast(iDrinkIntent);
+            }
+        });
+
         // проверю статус таймера
         LiveData<List<WorkInfo>> timerWorkerStatus = WorkManager.getInstance(mActivity).getWorkInfosForUniqueWorkLiveData(TIME_WORKER);
         timerWorkerStatus.observe(mActivity, new Observer<List<WorkInfo>>() {
             @Override
             public void onChanged(List<WorkInfo> status) {
                 // проверю, что фрагмент виден
-                if(isVisible()){
+                if (isVisible()) {
                     if (status != null && status.size() > 0) {
                         // если таймер запущен, выясню, какой из двух- таймер голодания или еды
                         if (status.get(0).getState().equals(WorkInfo.State.RUNNING) || status.get(0).getState().equals(WorkInfo.State.ENQUEUED)) {
                             startTimer();
-                            if (App.getInstance().isFasting) {
+                            if (App.getInstance().isFasting()) {
                                 // если период голодания- покажу таймер включения периода еды
                                 mStartEatingBtn.setVisibility(View.VISIBLE);
                                 mStartFastingBtn.setVisibility(View.INVISIBLE);
@@ -159,9 +178,11 @@ public class TimerFragment extends Fragment {
     }
 
 
-    /**
-     * method to start count down timer
-     */
+    /*
+      method to start count down timer
+
+     /*
+   //*
     private void startCountDownTimer() {
         mCountDownTimer = new CountDownTimer(mTimeCountInMilliSeconds, 1000) {
             @Override
@@ -181,7 +202,7 @@ public class TimerFragment extends Fragment {
             }
 
         }.start();
-    }
+    }*/
 
     /**
      * method to convert millisecond to time format
@@ -197,11 +218,15 @@ public class TimerFragment extends Fragment {
         mTimeView.setTextColor(getResources().getColor(R.color.danger_color));
         mCurrentTime.setTextColor(getResources().getColor(R.color.danger_color));
         mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_circle_danger_color));
+        mIEatBtn.setVisibility(View.GONE);
+        mIDrinkBtn.setVisibility(View.GONE);
     }
 
     private void itsEatingTime() {
         mTimeView.setTextColor(getResources().getColor(R.color.colorAccent));
         mCurrentTime.setTextColor(getResources().getColor(R.color.colorAccent));
         mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.drawable_circle_yellow));
+        mIEatBtn.setVisibility(View.VISIBLE);
+        mIDrinkBtn.setVisibility(View.VISIBLE);
     }
 }

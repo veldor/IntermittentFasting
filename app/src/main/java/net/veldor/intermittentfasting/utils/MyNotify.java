@@ -29,12 +29,10 @@ public class MyNotify {
     private static final int START_EAT_CODE = 1;
     private static final int START_FASTING_CODE = 2;
     private static final int SHOW_STAT_CODE = 3;
-    private static final int OPEN_APP_CODE = 4;
     private static final int I_EAT_CODE = 5;
     private static final int I_DRINK_CODE = 6;
-    public static final int TIMER_NOTIFICATION = 1;
-    private static final int FASTING_NOTIFICATION = 2;
-    private static final int EATING_NOTIFICATION = 3;
+    public static final int FASTING_NOTIFICATION = 2;
+    public static final int EATING_NOTIFICATION = 3;
     public static final int PERIOD_FINISHED_NOTIFICATION = 4;
     private final App mContext;
     public final NotificationManager mNotificationManager;
@@ -85,7 +83,7 @@ public class MyNotify {
         if (lastDrink != null) {
             drinkTime = String.format(Locale.ENGLISH, mContext.getString(R.string.last_drink_time_message), TimerWorker.hmsTimeFormatter(System.currentTimeMillis() - lastDrink.drinkTime));
         }
-        if (App.getInstance().isFasting) {
+        if (App.getInstance().isFasting()) {
             mFastingNotification.setStyle(new NotificationCompat.BigTextStyle().bigText(mContext.getString(R.string.you_fasting_message) + hmsTimeFormatter + "\n" + eatTime + "\n" + drinkTime));
             mNotificationManager.notify(FASTING_NOTIFICATION, mFastingNotification.build());
         } else {
@@ -116,7 +114,7 @@ public class MyNotify {
             long difference = System.currentTimeMillis() - startTime;
             String spendTime = TimerWorker.hmsTimeFormatter(difference);
             String message;
-            if (App.getInstance().isFasting) {
+            if (App.getInstance().isFasting()) {
                 message = mContext.getString(R.string.fasting_timing_message) + spendTime;
             } else {
                 message = mContext.getString(R.string.eating_timing_message) + spendTime;
@@ -134,7 +132,7 @@ public class MyNotify {
         }
     }
 
-    public void createFastingNotification() {
+    public Notification createFastingNotification() {
         // создам интент, который переключит таймер на пищевое окно
         Intent startEatIntent = new Intent(mContext, MiscActionsReceiver.class);
         startEatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_START_EATING);
@@ -147,14 +145,16 @@ public class MyNotify {
                 .setOngoing(true)
                 .addAction(R.drawable.ic_pregnant_woman_black_24dp, mContext.getString(R.string.start_eat_message), startEatPendingIntent);
         mFastingNotification = timerNotification;
-        mNotificationManager.notify(FASTING_NOTIFICATION, timerNotification.build());
+        Notification notification = timerNotification.build();
+        mNotificationManager.notify(FASTING_NOTIFICATION, notification);
+        return notification;
     }
 
     public void cancelFastingNotification() {
         mNotificationManager.cancel(FASTING_NOTIFICATION);
     }
 
-    public void createEatingNotification() {
+    public Notification createEatingNotification() {
         // создам интент, который отправит событие о еде
         Intent iEatIntent = new Intent(mContext, MiscActionsReceiver.class);
         iEatIntent.putExtra(EXTRA_ACTION_TYPE, MiscActionsReceiver.ACTION_I_EAT);
@@ -178,7 +178,9 @@ public class MyNotify {
                 .addAction(R.drawable.ic_free_breakfast_black_24dp, mContext.getString(R.string.i_drink_message), iDrinkPendingIntent)
                 .addAction(R.drawable.ic_pan_tool_black_24dp, mContext.getString(R.string.start_fasting_message), startFastingPendingIntent);
         mEatingNotification = timerNotification;
-        mNotificationManager.notify(EATING_NOTIFICATION, timerNotification.build());
+        Notification notification = timerNotification.build();
+        mNotificationManager.notify(EATING_NOTIFICATION, notification);
+        return notification;
     }
 
     public void cancelEatingNotification() {

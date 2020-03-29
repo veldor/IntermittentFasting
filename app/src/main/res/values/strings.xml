@@ -6,9 +6,7 @@
     <string name="start_fasting_timer">Start fasting timer!</string>
     <string name="zero_time" translatable="false">00:00:00</string>
     <string name="start_eating_timer">Start eating timer</string>
-    <string name="notification_channel_id">fasting timer</string>
     <string name="its_fasting_time_message">Fasting in progress</string>
-    <string name="stop_timer">Stop timer</string>
     <string name="timer_channel_description">Timer channel</string>
     <string name="congratulations_channel_description">congratulations channel</string>
     <string name="fasting_time_message">time to be hungry</string>
@@ -38,4 +36,6 @@
     <string name="eating_time_chart" >You eating time is %s (%d%%)</string>
     <string name="total_eats">Total eats per day: %d</string>
     <string name="total_drinks">Total drinks per day: %d</string>
+    <string name="you_eat_congrat">Congratulations, you are eat</string>
+    <string name="you_drink_congrat">Congratulations, you are drink</string>
 </resources>

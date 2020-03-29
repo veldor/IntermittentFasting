@@ -16,12 +16,9 @@ import net.veldor.intermittentfasting.R;
 
 public class SettingsFragment extends Fragment {
 
-    private SettingsViewModel notificationsViewModel;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        notificationsViewModel =
-                ViewModelProviders.of(this).get(SettingsViewModel.class);
+        SettingsViewModel notificationsViewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
         final TextView textView = root.findViewById(R.id.text_notifications);
         notificationsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {

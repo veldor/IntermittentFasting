@@ -1,13 +1,14 @@
 package net.veldor.intermittentfasting.receivers;
 
-import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import net.veldor.intermittentfasting.App;
 import net.veldor.intermittentfasting.MainActivity;
+import net.veldor.intermittentfasting.R;
 import net.veldor.intermittentfasting.db.DbQueries;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
@@ -43,7 +44,7 @@ public class MiscActionsReceiver extends BroadcastReceiver {
                     DbQueries.saveCurrentPeriod();
                     App.getNotifier().sendPeriodFinishedNotification();
                     // запущу период пищевого окна
-                    App.getInstance().isFasting = !App.getInstance().isFasting;
+                    App.getInstance().switchFasting(!App.getInstance().isFasting());
                     App.getInstance().startTimer();
                     // покажу уведомление о завершении прогресса
                     break;
@@ -59,9 +60,11 @@ public class MiscActionsReceiver extends BroadcastReceiver {
                     break;
                 case ACTION_I_EAT:
                     App.iEat();
+                    Toast.makeText(context, context.getString(R.string.you_eat_congrat), Toast.LENGTH_SHORT).show();
                     break;
                 case ACTION_I_I_DRINK:
                     App.iDrink();
+                    Toast.makeText(context, context.getString(R.string.you_drink_congrat), Toast.LENGTH_SHORT).show();
                     break;
             }
         }

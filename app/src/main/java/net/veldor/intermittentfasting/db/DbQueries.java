@@ -1,9 +1,6 @@
 package net.veldor.intermittentfasting.db;
 
-import android.util.Log;
-
 import net.veldor.intermittentfasting.App;
-import net.veldor.intermittentfasting.db.dao.EatDao;
 import net.veldor.intermittentfasting.db.dao.PeriodDao;
 import net.veldor.intermittentfasting.db.entity.Drink;
 import net.veldor.intermittentfasting.db.entity.Eat;
@@ -21,7 +18,7 @@ public class DbQueries {
         if(startTime > 0){
             PeriodDao dao = App.getDb().periodDao();
             Period period = new Period();
-            if(App.getInstance().isFasting){
+            if(App.getInstance().isFasting()){
                 period.periodType = PERIOD_FASTING;
             }
             else{
